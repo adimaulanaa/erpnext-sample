@@ -1,0 +1,1515 @@
+{%- from "templates/print_formats/standard_macros.html" import add_header, render_field with context -%}
+{% for page in layout %}
+
+<div class="pagebreak">
+    <div class="head" style="display: flex; flex-direction: row;">
+        <div style="width: 20%;">
+            <img height="150" width="150" src="/assets/erpnext/images/asshidiq-logo.png" />
+        </div>
+        <div style="width: 60%; font-size: 10px;" class="text-center">
+            <h4 style="padding-top: 5px;">AS SHIDIQ AQIQAH</h4>
+            <p class="bold">HEAD OFFICE</p>
+            <P>Jl. Ciledug Raya No. 3H Jakarta Selatan (samping Apart. Gateway / Kampus Budi Luhur</P>
+            <p>Telp. : 021 2270 3987, 0813 15 392 393, Fax : 021 584 1597</p>
+            <p>Pengiriman/Delivery : 021 7377 141</p>
+            <p>No Rek: BCA (476-3013-891)</p>
+            <p>a/n PT Asshidiq Cater Indonesia</p>
+            <p>Website : www.asshidiqaqiqah.com</p>
+            <h5 style="padding-top: 10px;">FOMULIR SALES ORDER</h5>
+        </div>
+        <div style="width: 20%; text-align: right; padding-top: 5px;">
+            <h6>No: {{ doc.name }}</h6>
+        </div>
+    </div>
+    <div>
+        <table style="margin: 0; font-size: 10px; line-height: 8px;" width="100%">
+            <tr>
+                <td width="15%">{{ _("Tanggal Acara") }}</td>
+                <td>:</td>
+                <td width="90%">
+                    {% set time = frappe.utils.get_datetime(doc.event_date_time).strftime("%A") %}
+                    {%- if time == 'Monday' -%}
+                    {% set defaultDay = 'Senin' %}
+                    {%- elif time == 'Tuesday' -%}
+                    {% set defaultDay = 'Selasa' %}
+                    {%- elif time == 'Wednesday' -%}
+                    {% set defaultDay = 'Rabu' %}
+                    {%- elif time == 'Thursday' -%}
+                    {% set defaultDay = 'Kamis' %}
+                    {%- elif time == 'Friday' -%}
+                    {% set defaultDay = 'Jumat' %}
+                    {%- elif time == 'Saturday' -%}
+                    {% set defaultDay = 'Sabtu' %}
+                    {%- elif time == 'Sunday' -%}
+                    {% set defaultDay = 'Minggu' %}
+                    {%- else -%}
+                    {% set defaultDay = time %}
+                    {%- endif -%}
+                    {{ defaultDay }}, {{ frappe.utils.get_datetime(doc.event_date_time).strftime("%d %B %Y")
+                    }}
+                </td>
+            </tr>
+            <tr>
+                <td>{{ _("Jam Tiba/Diambil") }}</td>
+                <td>:</td>
+                <td>
+                    {{frappe.utils.format_datetime(doc.event_date_time, "HH:mm") }}
+                </td>
+            </tr>
+            <tr>
+                <td>{{ _("Diantar/Diambil") }}</td>
+                <td>:</td>
+                <td>{{ doc.order_delivery }}</td>
+            </tr>
+            <tr>
+                <td>{{ _("Nama Pemesan") }}</td>
+                <td>:</td>
+                <td>{{ doc.customer_name }}</td>
+            </tr>
+            <tr>
+                <td>{{ _("Nama Keluarga") }}</td>
+                <td>:</td>
+                <td>
+                    {% if doc.aqiqah_detail|length > 1 %}
+                    {%- for item in doc.aqiqah_detail if loop.first -%}
+                    {% set jum = loop.first %}
+                    {% if jum == True %}
+                    {{ item.father_name }} & {{ item.mother_name }}
+                    {% else %}
+                    &nbsp;
+                    {% endif %}
+                    {%- endfor -%}
+                    {% else %}
+                    {% if doc.aqiqah_detail|length > 0 %}
+                    {%- for item in doc.aqiqah_detail -%}
+                    {{ item.father_name }} & {{ item.mother_name }}
+                    {%- endfor -%}
+                    {% else %}
+                    -
+                    {% endif %}
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+        {% if doc.aqiqah_detail|length > 1 %}
+        <div style="display: flex; flex-direction: row; font-size: 10px; padding-left: 6px; ">
+            <div style="width: 17%">
+                {{ _("Yang di aqiqahkan") }}
+            </div>
+            <div style="width: 29%">
+                {% if doc.aqiqah_detail|length > 0 %}
+                {%- for item in doc.aqiqah_detail -%}
+                {{ loop.index }}. {{ item.aqiqah_name }}
+                {% if item.gender == 'PEREMPUAN' %}
+                Binti {% if item.father_name != None %}{{ item.father_name }}{% else %} - {% endif %} <br />
+                {% else %}
+                Bin {% if item.father_name != None %}{{ item.father_name }}{% else %} - {% endif %} <br />
+                {% endif %}
+                {%- endfor -%}
+                {% else %}
+                -
+                {% endif %}
+            </div>
+            <div style="width: 14%"></div>
+            <div style="width: 20%; padding-left: 10px;">
+                {% if doc.aqiqah_detail|length > 0 %}
+                {%- for item in doc.aqiqah_detail -%}
+                {%- if (item.birth_date != None) and (item.birth_date != 0) -%}
+                {% if doc.aqiqah_detail|length > 1 %}
+                {{ _("Tanggal Lahir") }}&nbsp;{{ loop.index }}. {{ frappe.utils.formatdate(item.birth_date,
+                "dd-mm-yyyy") }} <br />
+                {% else %}
+                {{ _("Tanggal Lahir") }}&nbsp;{{ frappe.utils.formatdate(item.birth_date, "dd-mm-yyyy") }}
+                {% endif %}
+                {%- endif -%}
+                {%- endfor -%}
+                {% endif %}
+            </div>
+            <div style="width: 20%; padding-left: 22px;">
+                {% if doc.aqiqah_detail|length > 0 %}
+                {%- for item in doc.aqiqah_detail -%}
+                {%- if (item.birth_order != None) and (item.birth_order != 0) -%}
+                {% if doc.aqiqah_detail|length > 1 %}
+                {{ loop.index }}. Anak Ke {{ item.birth_order }}<br />
+                {% else %}
+                Anak Ke {{ item.birth_order }}<br />
+                {% endif %}
+                {%- endif -%}
+                {%- endfor -%}
+                {% endif %}
+            </div>
+        </div>
+        {% else %}
+        <div style="display: flex; flex-direction: row; font-size: 10px; padding-left: 6px; ">
+            <div style="width: 17%">
+                {{ _("Yang di aqiqahkan") }}
+            </div>
+            <div style="width: 29%">
+                {% if doc.aqiqah_detail|length > 0 %}
+                {%- for item in doc.aqiqah_detail -%}
+                {{ loop.index }}. {{ item.aqiqah_name }}
+                {% if item.gender == 'PEREMPUAN' %}
+                Binti {% if item.father_name != None %}{{ item.father_name }}{% else %} - {% endif %} <br />
+                {% else %}
+                Bin {% if item.father_name != None %}{{ item.father_name }}{% else %} - {% endif %} <br />
+                {% endif %}
+                {%- endfor -%}
+                {% else %}
+                -
+                {% endif %}
+            </div>
+            <div style="width: 14%"></div>
+            <div style="width: 20%; padding-left: 10px;">
+                {% if doc.aqiqah_detail|length > 0 %}
+                {%- for item in doc.aqiqah_detail -%}
+                {%- if (item.birth_date != None) and (item.birth_date != 0) -%}
+                {% if doc.aqiqah_detail|length > 1 %}
+                {{ _("Tanggal Lahir") }}&nbsp;{{ loop.index }}. {{ frappe.utils.formatdate(item.birth_date,
+                "dd-mm-yyyy") }} <br />
+                {% else %}
+                {{ _("Tanggal Lahir") }}&nbsp;{{ frappe.utils.formatdate(item.birth_date, "dd-mm-yyyy") }}
+                {% endif %}
+                {%- endif -%}
+                {%- endfor -%}
+                {% endif %}
+            </div>
+            <div style="width: 10%; padding-left: 22px;">
+                {% if doc.aqiqah_detail|length > 0 %}
+                {%- for item in doc.aqiqah_detail -%}
+                {%- if (item.birth_order != None) and (item.birth_order != 0) -%}
+                {% if doc.aqiqah_detail|length > 1 %}
+                {{ loop.index }}. Anak Ke {{ item.birth_order }}
+                {% else %}
+                Anak Ke {{ item.birth_order }}
+                {% endif %}
+                {%- endif -%}
+                {%- endfor -%}
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+        <table style="margin: 0; font-size: 10px; line-height: 8px; " width="100%">
+            <tr style="line-height: 12px;">
+                <td width="15%">{{ _("Alamat") }} </td>
+                <td>:</td>
+                <td width="90%">
+                    {% if doc.customer_address != '' %}
+                    {% set addres = frappe.get_doc("Address", doc.customer_address) %}
+                    {% else %}
+                    {% set addres = frappe.get_doc("Address", doc.shipping_address_name) %}
+                    {% endif %}
+                    {{ addres.address_line1 }} <br />
+                    - {{ addres.region_sub_district_name }} | {{ addres.region_district_name }} | {{
+                    addres.region_city_name }} (Kota)
+                </td>
+            </tr>
+            <tr style="line-height: 8px;">
+                <td>{{ _("No. Telp.") }}</td>
+                <td>:</td>
+                <td>
+                    {% set customer = frappe.get_doc("Customer", doc.customer) %}
+                    {% if customer.lead_name != None %}
+                    {% set lead = frappe.get_doc("Lead", customer.lead_name) %}
+                    {% if lead.phone != None %}{{ lead.phone }}{% else %} - {% endif %}
+                    {% if lead.mobile_no != None %} / {{ lead.mobile_no }} /{% else %} - {% endif %}
+                    {% else %}
+                    {% if doc.contact_phone != None %} {{ doc.contact_phone }}{% else %} {% if customer.phone_number !=
+                    '0' %} {{ customer.phone_number }} {% else %} - {% endif %} {% endif %}
+                    {% if doc.contact_mobile != None %} / {{ doc.contact_mobile }} /{% else %} {% if
+                    customer.mobile_number != '0' %} / {{ customer.mobile_number }} {% else %} - {% endif %} {% endif %}
+                    {% endif %}
+                </td>
+            </tr>
+            <tr style="line-height: 8px;">
+                <td>{{ _("Pemotongan") }}</td>
+                <td>:</td>
+                <td>
+                    {% if doc.is_cutting_witnessed == 1 %}
+                    {{ _("Disaksikan") }}
+                    {% else %}
+                    {{ _("Tidak Disaksikan") }}
+                    {% endif %}
+                </td>
+            </tr>
+            {% if doc.aqiqah_package_box_type != "" %}
+            <tr style="line-height: 8px;">
+                <td>{{ _("Tipe Box") }}</td>
+                <td>:</td>
+                <td>
+                    {{ doc.aqiqah_package_box_type }}
+                </td>
+            </tr>
+            {% endif %}
+            {% if (doc.aqiqah_package_box_packaging != "None" or doc.aqiqah_package_box_packaging != "") or (doc.packaging_use_name != "None" or doc.packaging_use_name != "") %}
+            <tr style="line-height: 8px;">
+                <td>{{ _("Tipe Kemasan") }}</td>
+                <td>:</td>
+                <td>
+                    {% if doc.aqiqah_package_box_packaging != ""  %}
+                    {{ doc.aqiqah_package_box_packaging }}
+                    {% else %}
+                    {{ doc.packaging_use_name }}
+                    {% endif %}
+                </td>
+            </tr>
+            {% endif %}
+            <tr style="line-height: 12px;">
+                <td>{{ _("Jenis Nasi") }}</td>
+                <td>:</td>
+                <td>
+                    {% if doc.aqiqah_package_menu|length > 0 %}
+                    {%- for item in doc.aqiqah_package_menu -%}
+                    {% if doc.aqiqah_package_menu|length > 1 %}
+                    {{ loop.index }}. NASI&nbsp;{{ item.rice_type }} <br />
+                    {% else %}
+                    NASI&nbsp;{{ item.rice_type }}
+                    {% endif %}
+                    {%- endfor -%}
+                    {% endif %}
+
+                    {% set checklist = ['briyani', 'kebuli', 'putih', 'mandhi'] %}
+                    {% set arr = namespace(value=1) %}
+                    {% if doc.order_detail|length > 0 %}
+                    {%- for item in doc.order_detail -%}
+                    {%- for check in checklist -%}
+                    {% if (item['is_pas_nasi_' + check] == 1) or (item['is_pae_nasi_' + check] == 1) %}
+                    {{ arr.value }}. NASI&nbsp;{{ check.upper() }} <br />
+                    {% set arr.value = arr.value|int + 1 %}
+                    {% endif %}
+                    {%- endfor -%}
+                    {%- endfor -%}
+                    {% endif %}
+                </td>
+            </tr>
+            {% if doc.is_gift_note == 1 %}
+            <tr style="line-height: 15px;">
+                <td>{{ _("Gift") }}</td>
+                <td>:</td>
+                <td>
+                    {{ doc.gift_note }} <br>
+                    Total Gift : {{ doc.gift_quantity }}
+                </td>
+            </tr>
+            {% endif %}
+            <tr style="line-height: 8px;">
+                <td>{{ _("Catatan") }}</td>
+                <td>:</td>
+                <td>
+                    {% if doc.notes != None %}
+                    {{ doc.notes }}
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+        <br />
+        <table style="margin: 0; font-size: 10px; line-height: 8px;" class="table table text-left ">
+            <tr>
+                <td class="text-center"><b>{{ _("Jumlah") }}</b></td>
+                <td><b>{{ _("Kode Produk") }}</b></td>
+                <td><b>{{ _("Nama Produk") }}</b></td>
+                <td><b>{{ _("Harga Satuan") }}</b></td>
+                <td><b>{{ _("Nominal") }}</b></td>
+            </tr>
+            {%- for item in doc.order_detail -%}
+            {% if item.is_package == 1 %}
+            <!-- paket -->
+            {% if item.type == 'PAKET AQIQAH' %}
+            <tr>
+                <td class="text-center">{{ item.quantity }}</td>
+                <td>{{ item.type }}</td>
+                <td>
+                    {{ item.order_name }}&nbsp
+                    {% if doc.aqiqah_package_menu|length > 0 %}
+                    {%- for itemMenu in doc.aqiqah_package_menu -%}
+                    {% if itemMenu.order_type == item.order_name %}
+                    {% if itemMenu.add_on != None %}
+                    {%- if loop.index == 1 %}
+                    (+ {{ itemMenu.add_on }} )
+                    {% endif %}
+                    {% endif %}
+                    {% endif %}
+                    {%- endfor -%}<br />
+                    {% endif %}
+                    DOMBA&nbsp{{ item.gender_type }}
+                </td>
+                <td>{{ frappe.utils.fmt_money(item.unit_price, currency="") }}</td>
+                <td>{{ frappe.utils.fmt_money(item.total_price, currency="") }}</td>
+            </tr>
+            {% endif %}
+            <!-- non box -->
+            {% if item.type == 'NON BOX' %}
+            <tr>
+                <td class="text-center">{{ item.quantity }}</td>
+                <td>{{ item.type }}</td>
+                <td>{{ item.order_name }}&nbspDOMBA&nbsp{{ item.gender_type }}</td>
+                <td>{{ frappe.utils.fmt_money(item.unit_price, currency="") }}</td>
+                <td>{{ frappe.utils.fmt_money(item.total_price, currency="") }}</td>
+            </tr>
+            {% endif %}
+            {% if item.type == 'KAMBING GULING' %}
+            <tr>
+                <td class="text-center">{{ item.quantity }}</td>
+                <td>{{ item.type }}</td>
+                <td>{{ item.order_name }}&nbspDOMBA&nbsp{{ item.gender_type }}</td>
+                <td>{{ frappe.utils.fmt_money(item.unit_price, currency="") }}</td>
+                <td>{{ frappe.utils.fmt_money(item.total_price, currency="") }}</td>
+            </tr>
+            {% endif %}
+            <!-- mentah -->
+            {% if item.type == 'AQIQAH MENTAH' %}
+            <tr>
+                <td class="text-center">{{ item.total_quantity_1 }}</td>
+                <td>{{ item.type }}</td>
+                <td>{{ item.order_name }}&nbspDOMBA&nbsp{{ item.gender_type }}</td>
+                <td>{{ frappe.utils.fmt_money(item.unit_price, currency="") }}</td>
+                <td>{{ frappe.utils.fmt_money(item.total_price, currency="") }}</td>
+            </tr>
+            {% endif %}
+            <!-- paket super hemat -->
+            {% if item.type == 'PAKET SUPER HEMAT' %}
+            <tr>
+                <td class="text-center">{{ item.quantity }}</td>
+                <td>{{ item.type }}</td>
+                <td>{{ item.order_name }}</td>
+                <td>{{ frappe.utils.fmt_money(item.unit_price, currency="") }}</td>
+                <td>{{ frappe.utils.fmt_money(item.total_price, currency="") }}</td>
+            </tr>
+            {% endif %}
+            <!-- paket super ekonomis -->
+            {% if item.type == 'PAKET SUPER EKONOMIS' %}
+            <tr>
+                <td class="text-center">{{ item.quantity }}</td>
+                <td>{{ item.type }}</td>
+                <td>{{ item.order_name }}</td>
+                <td>{{ frappe.utils.fmt_money(item.unit_price, currency="") }}</td>
+                <td>{{ frappe.utils.fmt_money(item.total_price, currency="") }}</td>
+            </tr>
+            {% endif %}
+            <!-- paket tumpengan spesial -->
+            {% if item.type == 'PAKET TUMPENGAN SPESIAL' %}
+            <tr>
+                <td class="text-center">{{ item.quantity }}</td>
+                <td>{{ item.order_name }}</td>
+                <td>{{ item.type }}</td>
+                <td>{{ frappe.utils.fmt_money(item.unit_price, currency="") }}</td>
+                <td>{{ frappe.utils.fmt_money(item.total_price, currency="") }}</td>
+            </tr>
+            {% endif %}
+            <!-- paket tumpeng box -->
+            {% if item.type == 'PAKET TUMPENG BOX' %}
+            <tr>
+                <td class="text-center">{{ item.quantity }}</td>
+                <td>{{ item.order_name }}</td>
+                <td>{{ item.type }}&nbsp{{ item.gender_type }}</td>
+                <td>{{ frappe.utils.fmt_money(item.unit_price, currency="") }}</td>
+                <td>{{ frappe.utils.fmt_money(item.total_price, currency="") }}</td>
+            </tr>
+            {% endif %}
+            {% if item.type == 'PAKET ARABIAN' %}
+            <tr>
+                <td class="text-center">{{ item.quantity }}</td>
+                <td>{{ item.order_name }}</td>
+                <td>{{ item.type }}&nbsp{{ item.gender_type }}</td>
+                <td>{{ frappe.utils.fmt_money(item.unit_price, currency="") }}</td>
+                <td>{{ frappe.utils.fmt_money(item.total_price, currency="") }}</td>
+            </tr>
+            {% endif %}
+            <!-- paket arabian style -->
+            {% if item.type == 'PAKET ARABIAN STYLE' %}
+            <tr>
+                <td class="text-center">{{ item.quantity }}</td>
+                <td>{{ item.order_name }}</td>
+                <td>{{ item.type }}&nbsp{{ item.gender_type }}</td>
+                <td>{{ frappe.utils.fmt_money(item.unit_price, currency="") }}</td>
+                <td>{{ frappe.utils.fmt_money(item.total_price, currency="") }}</td>
+            </tr>
+            {% endif %}
+            <!-- paket aqiqah ekonomis -->
+            {% if item.type == 'PAKET AQIQAH EKONOMIS' %}
+            <tr>
+                <td class="text-center">{{ item.quantity }}</td>
+                <td>{{ item.order_name }}</td>
+                <td>{{ item.type }}&nbsp{{ item.gender_type }}</td>
+                <td>{{ frappe.utils.fmt_money(item.unit_price, currency="") }}</td>
+                <td>{{ frappe.utils.fmt_money(item.total_price, currency="") }}</td>
+            </tr>
+            {% endif %}
+            {% if item.type == 'PAKET REGULER BENTO' %}
+            <tr>
+                <td class="text-center">{{ item.quantity }}</td>
+                <td>{{ item.order_name }}</td>
+                <td>{{ item.type }}&nbsp{{ item.gender_type }}</td>
+                <td>{{ frappe.utils.fmt_money(item.unit_price, currency="") }}</td>
+                <td>{{ frappe.utils.fmt_money(item.total_price, currency="") }}</td>
+            </tr>
+            {% endif %}
+            {% if item.type == 'PAKET REGULER' %}
+            <tr>
+                <td class="text-center">{{ item.quantity }}</td>
+                <td>{{ item.order_name }}</td>
+                <td>PAKET REGULER&nbsp{{ item.gender_type }}</td>
+                <td>{{ frappe.utils.fmt_money(item.unit_price, currency="") }}</td>
+                <td>{{ frappe.utils.fmt_money(item.total_price, currency="") }}</td>
+            </tr>
+            {% endif %}
+            {% if item.type == 'PAKET PROMO REGULER' %}
+            <tr>
+                <td class="text-center">{{ item.quantity }}</td>
+                <td>{{ item.order_name }}</td>
+                <td>{{ item.type }}&nbsp{{ item.gender_type }}</td>
+                <td>{{ frappe.utils.fmt_money(item.unit_price, currency="") }}</td>
+                <td>{{ frappe.utils.fmt_money(item.total_price, currency="") }}</td>
+            </tr>
+            {% endif %}
+            {% if item.type == 'PAKET PROMO ARABIAN' %}
+            <tr>
+                <td class="text-center">{{ item.quantity }}</td>
+                <td>{{ item.order_name }}</td>
+                <td>{{ item.type }}&nbsp{{ item.gender_type }}</td>
+                <td>{{ frappe.utils.fmt_money(item.unit_price, currency="") }}</td>
+                <td>{{ frappe.utils.fmt_money(item.total_price, currency="") }}</td>
+            </tr>
+            {% endif %}
+            <!--  -->
+            {% else %}
+            <!-- paket aqiqah sataun -->
+            {% if item.type == 'PAKET AQIQAH' %}
+            <tr>
+                <td class="text-center">{{ item.quantity }}</td>
+                <td>{{ item.type }}</td>
+                <td>
+                    {{ item.order_name }}&nbsp
+                    {% if doc.aqiqah_package_menu|length > 0 %}
+                    {%- for itemMenu in doc.aqiqah_package_menu -%}
+                    {% if itemMenu.order_type == item.order_name %}
+                    {% if itemMenu.add_on != None %}
+                    {%- if loop.index == 1 %}
+                    (+ {{ itemMenu.add_on }} )
+                    {% endif %}
+                    {% endif %}
+                    {% endif %}
+                    {%- endfor -%}<br />
+                    {% endif %}
+                    DOMBA&nbsp{{ item.gender_type }}
+                </td>
+                <td>{{ frappe.utils.fmt_money(item.unit_price, currency="") }}</td>
+                <td>{{ frappe.utils.fmt_money(item.total_price, currency="") }}</td>
+            </tr>
+            {% endif %}
+            <!-- non box satuan -->
+            {% if item.type == 'NON BOX' or item.type == 'KAMBING GULING' %}
+            {% set checklist = [
+            'gulai', 'kari', 'bakar_bbq', 'semur', 'sop', 'tengkleng', 'tongseng',
+            'guling', 'masak_bombay', 'sate', 'panggang', 'teriyaki'
+            ] %}
+            {%- for check in checklist -%}
+            {% if item['is_' + check] == 1 %}
+            {% set list = check.split('_') %}
+            {% set labelName = namespace(value='') %}
+            {%- for listName in list -%}
+            {% set labelName.value = labelName.value + ' ' + listName %}
+            {%- endfor -%}
+            {% if item.is_package == 0 %}
+            <tr>
+                <td class="text-center">{{ item.total_quantity_1 }}</td>
+                <td>{{ item.type }}</td>
+                <td>{{ item.order_name }}&nbspDOMBA&nbsp{{ item.gender_type }} - {{ labelName.value.upper() }}</td>
+                <td>{{ frappe.utils.fmt_money(item.unit_price, currency="") }}</td>
+                <td>{{ frappe.utils.fmt_money(item.total_price, currency="") }}</td>
+            </tr>
+            {% endif %}
+            {% endif %}
+            {%- endfor -%}
+            {% endif %}
+            <!-- selesai satuan non box -->
+            <!-- paket box istimewa -->
+            {% if item.type == 'PAKET BOX ISTIMEWA' %}
+            <tr>
+                <td class="text-center">{{ item.total_quantity_1 }}</td>
+                <td>{{ item.type }}</td>
+                <td>{{ item.order_name }}</td>
+                <td>{{ frappe.utils.fmt_money(item.unit_price, currency="") }}</td>
+                <td>{{ frappe.utils.fmt_money(item.total_price, currency="") }}</td>
+            </tr>
+            {% endif %}
+            <!-- paket abg -->
+            {% if item.type == 'PAKET ABG' %}
+            <tr>
+                <td class="text-center">{{ item.total_quantity_1 }}</td>
+                <td>{{ item.type }}</td>
+                <td>
+                    {%- if item.order_name == 'DADA' -%}
+                    AYAM BAKAR GENTONG ({{ item.order_name }})
+                    {%- elif item.order_name == 'PAHA' -%}
+                    AYAM BAKAR GENTONG ({{ item.order_name }})
+                    {%- elif item.order_name == 'AYAM 1 EKOR' -%}
+                    PAKET {{ item.order_name }}
+                    {%- else -%}
+                    {{ item.order_name }}
+                    {%- endif -%}
+                </td>
+                <td>{{ frappe.utils.fmt_money(item.unit_price, currency="") }}</td>
+                <td>{{ frappe.utils.fmt_money(item.total_price, currency="") }}</td>
+            </tr>
+            {% endif %}
+            <!-- nasi nampan -->
+            {% if item.type == 'NASI NAMPAN' %}
+            <tr>
+                <td class="text-center">{{ item.quantity }}</td>
+                <td>{{ item.type }}</td>
+                <td>{{ item.order_name }}</td>
+                <td>{{ frappe.utils.fmt_money(item.unit_price, currency="") }}</td>
+                <td>{{ frappe.utils.fmt_money(item.total_price, currency="") }}</td>
+            </tr>
+            {% endif %}
+            <!-- paket prasmanan -->
+            {% if item.type == 'PAKET PRASMANAN' %}
+            <tr>
+                <td class="text-center">{{ item.total_quantity_1 }}</td>
+                <td>{{ item.type }}</td>
+                <td>{{ item.order_name }}</td>
+                <td>{{ frappe.utils.fmt_money(item.unit_price, currency="") }}</td>
+                <td>{{ frappe.utils.fmt_money(item.total_price, currency="") }}</td>
+            </tr>
+            {% endif %}
+            <!-- Satuan -->
+            {% if item.type == 'SATUAN' %}
+            <tr>
+                <td class="text-center">{{ item.total_quantity_1 }}</td>
+                <td>{{ item.type }}</td>
+                <td>{{ item.order_name }}</td>
+                <td>{{ frappe.utils.fmt_money(item.unit_price, currency="") }}</td>
+                <td>{{ frappe.utils.fmt_money(item.total_price, currency="") }}</td>
+            </tr>
+            {% endif %}
+            <!-- makan gratis -->
+            {% if item.type == 'MAKAN GRATIS' %}
+            <tr>
+                <td class="text-center">{{ item.total_quantity_1 }}</td>
+                <td>{{ item.type }}</td>
+                <td>{{ item.order_name }}</td>
+                <td>{{ frappe.utils.fmt_money(item.unit_price, currency="") }}</td>
+                <td>{{ frappe.utils.fmt_money(item.total_price, currency="") }}</td>
+            </tr>
+            {% endif %}
+            {% endif %}
+            {%- endfor -%}
+            <!-- Kungkus Cup -->
+            {% set qtyBungkus = namespace(value=0) %}
+            {% set priceBungkus = namespace(value=0) %}
+            {% set totalPriceBungkus = namespace(value=0) %}
+            {%- for item in doc.order_detail -%}
+            {% if item.is_order_bungkus_cup == 1 %}
+            {% if item.is_order_bungkus_cup_qty > 0 %}
+            {% set qtyBungkus.value = qtyBungkus.value + item.is_order_bungkus_cup_qty|int %}
+            {% else %}
+            {% set qtyBungkus.value = qtyBungkus.value + item.total_quantity_1|int %}
+            {% endif %}
+            {% set priceBungkus.value = item.unit_price_bungkus_cup|int %}
+            {% set totalPriceBungkus.value = qtyBungkus.value * priceBungkus.value|int %}
+            {% endif %}
+            {%- endfor -%}
+            {% if qtyBungkus.value | int > 0 %}
+            <tr>
+                <td class="text-center">{{ qtyBungkus.value }}</td>
+                <td>{{ _("CUP") }}</td>
+                <td>{{ _("BUNGKUS CUP") }}</td>
+                <td>{{ frappe.utils.fmt_money(priceBungkus.value, currency="") }}</td>
+                <td>{{ frappe.utils.fmt_money(totalPriceBungkus.value, currency="") }}</td>
+            </tr>
+            {% endif %}
+            <!-- Bingkai -->
+            {% if doc.is_free_bingkai == 1 %}
+            <tr>
+                <td class="text-center">                    
+                    {% if doc.aqiqah_detail|length > 0 %}
+                    {{ doc.aqiqah_detail|length }}
+                    {% else %}
+                    {{ doc.free_bingkai_quantity }}
+                    {% endif %}
+                </td>
+                <td>{{ _("BNK") }}</td>
+                <td>{{ _("Bingkai") }}</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            {% endif %}
+            <!-- Tumbler -->
+            {% if doc.is_free_tumbler == 1 %}
+            <tr>
+                <td class="text-center">{{ doc.free_tumbler_quantity }}</td>
+                <td>{{ _("TBL") }}</td>
+                <td>{{ _("Tumbler") }}</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            {% endif %}
+            <tr>
+                <td colspan="3" rowspan="5"></td>
+                <td>Subtotal</td>
+                <td>{{ frappe.utils.fmt_money(doc.total_price, currency="") }}</td>
+            </tr>
+            <tr>
+                <td>Jasa Pengiriman</td>
+                <td>{{ frappe.utils.fmt_money(doc.total_shipping_price, currency="") }}</td>
+            </tr>
+            <tr>
+                <td>Discount</td>
+                <td>{{ frappe.utils.fmt_money(doc.total_discount, currency="") }}</td>
+            </tr>
+            <tr>
+                <td>Grand Total</td>
+                <td>{{ frappe.utils.fmt_money(doc.total_payment, currency="") }}</td>
+            </tr>
+            <tr>
+                <td colspan="5" style="line-height: 2px;"></td>
+            </tr>
+        </table>
+        <div class="data">
+            <div class="kiri">
+                {% if doc.skph_box != None %}
+                {% set skphBox = frappe.get_doc("SKPH Box", doc.skph_box) %}
+                {% endif %}
+                {% if doc.skph_order != None %}
+                {% set skphOrder = frappe.get_doc("SKPH Order", doc.skph_order) %}
+                {% endif %}
+                <!-- Sate -->
+                <table class="tg pagebreak" width="70%" style="font-size: 10px; line-height: 9px;">
+                    <tr class="bold">
+                        <td>Nama Masakan</td>
+                        <td>Jumlah Tusuk</td>
+                        <td>Porsi per Bungkus</td>
+                        <td>Jumlah Bungkus</td>
+                        <td>Sisa</td>
+                        <td>Keterangan</td>
+                    </tr>
+                    <!-- Paket -->
+                    {% set packageMenu = {}|list %}
+                    {% if doc.aqiqah_package_menu|length > 0 %}
+                    {%- for itemMenu in doc.aqiqah_package_menu -%}
+                    {% if itemMenu.meat_cook_type_1 != '' %}
+                    {% if itemMenu.meat_cook_type_1 == 'SATE' %}
+                    {%- set _ = packageMenu.append({'label': itemMenu.meat_cook_type_1, 'qty': itemMenu.quantity,
+                    'paket':
+                    itemMenu.order_type}) -%}
+                    {% endif %}
+                    {% endif %}
+                    {% if itemMenu.meat_cook_type_2 != '' %}
+                    {% if itemMenu.meat_cook_type_2 == 'SATE' %}
+                    {%- set _ = packageMenu.append({'label': itemMenu.meat_cook_type_2, 'qty': itemMenu.quantity,
+                    'paket':
+                    itemMenu.order_type}) -%}
+                    {% endif %}
+                    {% endif %}
+                    {%- endfor -%}
+                    {% endif %}
+                    {% for group in packageMenu|groupby('label') %}
+                    {% for menu in group.list %}
+                    {%- if loop.index == 1 %}
+                    {%- for orderDetail in doc.order_detail -%}
+                    {% if menu.paket == orderDetail.order_name %}
+                    <tr>
+                        <td>{{ menu.label }}</td>
+                        <td>{{ skphBox.bungkus_sate_quantity }}</td>
+                        <td>{{ skphBox.porsi_per_bungkus_sate_quantity }} | {{ skphBox.porsi_per_bungkus_sate_quantity_2
+                            }}</td>
+                        <td>{{ skphBox.total_bungkus_1 }} | {{ skphBox.total_bungkus_2 }}</td>
+                        <td>{{ skphBox.sisa_sate_quantity }}</td>
+                        <td>
+                            {% if skphBox.sisa_sate_quantity > 0 %}
+                            Global
+                            {% else %}
+                            {% if skphBox.porsi_sate_description != '' %}
+                            {{ skphBox.porsi_sate_description }}
+                            {% else %}
+                            -
+                            {% endif %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {%- endfor -%}
+                    {% endif %}
+                    {% endfor %}
+                    {% endfor %}
+                    <!-- Non Box -->
+                    {%- for orderDetail in doc.order_detail -%}
+                    {% if orderDetail.type == 'NON BOX' or orderDetail.type == 'KAMBING GULING' %}
+                    {% if orderDetail.is_sate == 1 %}
+                    <tr>
+                        <td>SATE</td>
+                        <td>{{ skphOrder.bungkus_sate_quantity }}</td>
+                        <td>{{ skphOrder.porsi_per_bungkus_sate_quantity }} | {{
+                            skphOrder.porsi_per_bungkus_sate_quantity_2 }}</td>
+                        <td>{{ skphOrder.total_bungkus_1 }} | {{ skphOrder.total_bungkus_2 }}</td>
+                        <td>{{ skphOrder.sisa_sate_quantity }}</td>
+                        <td>
+                            {% if skphOrder.sisa_sate_quantity > 0 %}
+                            Global
+                            {% else %}
+                            {% if skphOrder.porsi_sate_description != '' %}
+                            {{ skphOrder.porsi_sate_description }}
+                            {% else %}
+                            -
+                            {% endif %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% if orderDetail.is_kering_sate == 1 %}
+                    <tr>
+                        <td>SATE</td>
+                        <td>{{ skphOrder.bungkus_sate_quantity }}</td>
+                        <td>{{ skphOrder.porsi_per_bungkus_sate_quantity }} | {{
+                            skphOrder.porsi_per_bungkus_sate_quantity_2 }}</td>
+                        <td>{{ skphOrder.total_bungkus_1 }} | {{ skphOrder.total_bungkus_2 }}</td>
+                        <td>{{ skphOrder.sisa_sate_quantity }}</td>
+                        <td>
+                            {% if skphOrder.sisa_sate_quantity > 0 %}
+                            Global
+                            {% else %}
+                            {% if skphOrder.porsi_sate_description != '' %}
+                            {{ skphOrder.porsi_sate_description }}
+                            {% else %}
+                            -
+                            {% endif %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% endif %}
+                    {%- endfor -%}
+                </table>
+                <br />
+                <!-- Non Sate -->
+                <table class="tg pagebreak" width="70%" style="font-size: 10px; line-height: 9px;">
+                    <tr class="bold">
+                        <td>Nama Masakan</td>
+                        <td>Jumlah Porsi</td>
+                        <td>Porsi per Bungkus</td>
+                        <td>Jumlah Bungkus</td>
+                        <td>Sisa</td>
+                        <td>Keterangan</td>
+                    </tr>
+                    <!-- Paket -->
+                    {% set packageMenu = {}|list %}
+                    {% if doc.aqiqah_package_menu|length > 0 %}
+                    {%- for itemMenu in doc.aqiqah_package_menu -%}
+                    {% if itemMenu.meat_cook_type_1 != '' %}
+                    {% if itemMenu.meat_cook_type_1 != 'SATE' %}
+                    {%- set _ = packageMenu.append({'label': itemMenu.meat_cook_type_1, 'qty': itemMenu.quantity,
+                    'paket':
+                    itemMenu.order_type}) -%}
+                    {% endif %}
+                    {% endif %}
+                    {% if itemMenu.meat_cook_type_2 != '' %}
+                    {% if itemMenu.meat_cook_type_2 != 'SATE' %}
+                    {%- set _ = packageMenu.append({'label': itemMenu.meat_cook_type_2, 'qty': itemMenu.quantity,
+                    'paket':
+                    itemMenu.order_type}) -%}
+                    {% endif %}
+                    {% endif %}
+                    {%- endfor -%}
+                    {% endif %}
+                    {% for group in packageMenu|groupby('label') %}
+                    {% for menu in group.list %}
+                    {%- if loop.index == 1 %}
+                    {%- for orderDetail in doc.order_detail -%}
+                    {% if menu.paket == orderDetail.order_name %}
+                    <tr>
+                        <td>{{ menu.label }}</td>
+                        <td>{{ group.list|sum(attribute='qty') }}</td>
+                        <td>{{ skphBox.porsi_per_bungkus_non_sate_quantity }}</td>
+                        {% if (orderDetail.is_global == 1) or (orderDetail.global_all == 1) %}
+                        <td>
+                            {% set qtyGlobal = namespace(value=0) %}
+                            {% if orderDetail.global_all == 1 %}
+                            {% set qtyGlobal.value = 1|int %}
+                            {% else %}
+                            {% set qtyGlobal.value = group.list|sum(attribute='qty') - orderDetail.is_global_qty %}
+                            {% endif %}
+                            {{ qtyGlobal.value }}
+                        </td>
+                        <td>
+                            {% if orderDetail.global_all == 1 %}
+                            {{ group.list|sum(attribute='qty') }}
+                            {% else %}
+                            {{ orderDetail.is_global_qty|int }}
+                            {% endif %}
+                        </td>
+                        <td>Global</td>
+                        {% else %}
+                        <td>{{ group.list|sum(attribute='qty') }}</td>
+                        <td>{{ skphBox.sisa_non_sate_quantity }}</td>
+                        <td>{% if skphBox.porsi_non_sate_description != '' %}
+                            {{ skphBox.porsi_non_sate_description }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endif %}
+                    {%- endfor -%}
+                    {% endif %}
+                    {% endfor %}
+                    {% endfor %}
+
+                    {%- for orderDetail in doc.order_detail -%}
+                    <!-- paket -->
+                    {% if orderDetail.is_package == 1 %}
+                    <!-- Non Box -->
+                    {% if orderDetail.type == 'NON BOX' or orderDetail.type == 'KAMBING GULING' %}
+                    {% set checklist = [
+                    'gulai', 'kari', 'bakar_bbq', 'semur', 'sop', 'tengkleng', 'tongseng',
+                    'guling', 'masak_bombay', 'panggang', 'teriyaki', 'kuah_gulai', 'kuah_kari', 
+                    'kuah_bakar_bbq', 'kuah_semur', 'kuah_sop', 'kuah_tengkleng', 'kuah_tongseng',
+                    'kuah_guling', 'kuah_masak_bombay', 'kuah_panggang', 'kuah_teriyaki'
+                    ] %}
+                    {%- for check in checklist -%}
+                    {% if orderDetail['is_' + check] == 1 and orderDetail['quantity_' + check]|int != 0 or orderDetail['is_' + check] == 1 and orderDetail['type'] == 'KAMBING GULING' %}
+                    {% set list = check.split('_') %}
+                    {% set labelName = namespace(value='') %}
+                    {%- for listName in list -%}
+                    {% set labelName.value = labelName.value + ' ' + listName %}
+                    {%- endfor -%}                      
+                    <tr>
+                        <td>{{ labelName.value.upper() }}</td>
+                        <td>{{ orderDetail['quantity_' + check] }}</td>
+                        <td>{{ skphOrder.porsi_per_bungkus_non_sate_quantity }}</td>
+                        {% if (orderDetail.is_global == 1) or (orderDetail.global_all == 1) %}
+                        <td>
+                            {% set qtyGlobal = namespace(value=0) %}
+                            {% if orderDetail.global_all == 1 %}
+                            {% set qtyGlobal.value = 1|int %}
+                            {% else %}
+                            {% set qtyGlobal.value = orderDetail['quantity_' + check]|int - orderDetail.is_global_qty|int %}
+                            {% endif %}
+                            {{ qtyGlobal.value|int }}
+                        </td>
+                        <td>{% if orderDetail.global_all == 1 %} {{ orderDetail['quantity_' + check]|int }}{% else %}
+                            {{ orderDetail.is_global_qty|int }}{% endif %}</td>
+                        <td>Global</td>
+                        {% else %}
+                        <td>{{ orderDetail['quantity_' + check] }}</td>
+                        <td>{{ skphOrder.sisa_non_sate_quantity }}</td>
+                        <td>{% if skphOrder.porsi_non_sate_description != '' %}
+                            {{ skphOrder.porsi_non_sate_description }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endif %}
+                    {%- endfor -%}
+                    {% endif %}
+                    <!-- Selesai Non Box -->
+                    <!-- Paket Super Hemat -->
+                    <!-- {% if orderDetail.type == 'PAKET SUPER HEMAT' %}
+                    {% if orderDetail.is_psh_domba_panggang == 1 %}
+                    <tr>
+                        <td>DOMBA PANGGANG</td>
+                        <td>{{ orderDetail.total_quantity_1 }}</td>
+                        <td>{{ skphBox.porsi_per_bungkus_non_sate_quantity }}</td>
+                        {% if (orderDetail.is_global == 1) or (orderDetail.global_all == 1) %}
+                        <td>
+                            {% set qtyGlobal = namespace(value=0) %}
+                            {% if orderDetail.global_all == 1 %}
+                            {% set qtyGlobal.value = 1|int %}
+                            {% else %}
+                            {% set qtyGlobal.value = orderDetail.total_quantity_1|int - orderDetail.is_global_qty|int %}
+                            {% endif %}
+                            {{ qtyGlobal.value|int }}
+                        </td>
+                        <td>{% if orderDetail.global_all == 1 %} {{ orderDetail.total_quantity_1|int }}{% else %}
+                            {{ orderDetail.is_global_qty|int }}{% endif %}</td>
+                        <td>Global</td>
+                        {% else %}
+                        <td>{{ orderDetail.total_quantity_1 }}</td>
+                        <td>{{ skphBox.sisa_non_sate_quantity }}</td>
+                        <td>{% if skphBox.porsi_non_sate_description != '' %}
+                            {{ skphBox.porsi_non_sate_description }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endif %}
+                    {% endif %} -->
+                    <!-- Selesai Paket Super Hemat -->
+                    <!-- paket super ekonomis -->
+                    {% if orderDetail.type == 'PAKET SUPER EKONOMIS' %}
+                    {% if orderDetail.is_pse_kambing_domba_guling == 1 %}
+                    <tr>
+                        <td>DOMBA GULING</td>
+                        <td>{{ orderDetail.total_quantity_1 }}</td>
+                        <td>{{ skphBox.porsi_per_bungkus_non_sate_quantity }}</td>
+                        {% if (orderDetail.is_global == 1) or (orderDetail.global_all == 1) %}
+                        <td>
+                            {% set qtyGlobal = namespace(value=0) %}
+                            {% if orderDetail.global_all == 1 %}
+                            {% set qtyGlobal.value = 1|int %}
+                            {% else %}
+                            {% set qtyGlobal.value = orderDetail.total_quantity_1|int - orderDetail.is_global_qty|int %}
+                            {% endif %}
+                            {{ qtyGlobal.value|int }}
+                        </td>
+                        <td>{% if orderDetail.global_all == 1 %} {{ orderDetail.total_quantity_1|int }}{% else %}
+                            {{ orderDetail.is_global_qty|int }}{% endif %}</td>
+                        <td>Global</td>
+                        {% else %}
+                        <td>{{ orderDetail.total_quantity_1 }}</td>
+                        <td>{{ skphBox.sisa_non_sate_quantity }}</td>
+                        <td>{% if skphBox.porsi_non_sate_description != '' %}
+                            {{ skphBox.porsi_non_sate_description }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endif %}
+                    {% endif %}
+                    <!-- selesai paket super ekonomis -->
+                    <!-- paket tumpengan spesial -->
+                    {% if orderDetail.type == 'PAKET TUMPENGAN SPESIAL' %}
+                    {% if orderDetail.is_pts_daging_panggang == 1 %}
+                    <tr>
+                        <td>DAGING PANGGANG</td>
+                        <td>{{ orderDetail.total_quantity_1 }}</td>
+                        <td>{{ skphBox.porsi_per_bungkus_non_sate_quantity }}</td>
+                        {% if (orderDetail.is_global == 1) or (orderDetail.global_all == 1) %}
+                        <td>
+                            {% set qtyGlobal = namespace(value=0) %}
+                            {% if orderDetail.global_all == 1 %}
+                            {% set qtyGlobal.value = 1|int %}
+                            {% else %}
+                            {% set qtyGlobal.value = orderDetail.total_quantity_1|int - orderDetail.is_global_qty|int %}
+                            {% endif %}
+                            {{ qtyGlobal.value|int }}
+                        </td>
+                        <td>{% if orderDetail.global_all == 1 %} {{ orderDetail.total_quantity_1|int }}{% else %}
+                            {{ orderDetail.is_global_qty|int }}{% endif %}</td>
+                        <td>Global</td>
+                        {% else %}
+                        <td>{{ orderDetail.total_quantity_1 }}</td>
+                        <td>{{ skphBox.sisa_non_sate_quantity }}</td>
+                        <td>{% if skphBox.porsi_non_sate_description != '' %}
+                            {{ skphBox.porsi_non_sate_description }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endif %}
+                    {% endif %}
+                    <!-- selesai paket tumpengan spesial -->
+                    <!-- paket arabian style -->
+                    {% if orderDetail.type == 'PAKET ARABIAN STYLE' %}
+                    {% if orderDetail.is_pas_domba_panggang == 1 %}
+                    <tr>
+                        <td>DAGING PANGGANG</td>
+                        <td>{{ orderDetail.total_quantity_1 }}</td>
+                        <td>{{ skphBox.porsi_per_bungkus_non_sate_quantity }}</td>
+                        {% if (orderDetail.is_global == 1) or (orderDetail.global_all == 1) %}
+                        <td>
+                            {% set qtyGlobal = namespace(value=0) %}
+                            {% if orderDetail.global_all == 1 %}
+                            {% set qtyGlobal.value = 1|int %}
+                            {% else %}
+                            {% set qtyGlobal.value = orderDetail.total_quantity_1|int - orderDetail.is_global_qty|int %}
+                            {% endif %}
+                            {{ qtyGlobal.value|int }}
+                        </td>
+                        <td>{% if orderDetail.global_all == 1 %} {{ orderDetail.total_quantity_1|int }}{% else %}
+                            {{ orderDetail.is_global_qty|int }}{% endif %}</td>
+                        <td>Global</td>
+                        {% else %}
+                        <td>{{ orderDetail.total_quantity_1 }}</td>
+                        <td>{{ skphBox.sisa_non_sate_quantity }}</td>
+                        <td>{% if skphBox.porsi_non_sate_description != '' %}
+                            {{ skphBox.porsi_non_sate_description }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endif %}
+                    {% endif %}
+                    <!-- selesai paket aqiqah ekonomis -->
+                    <!-- paket aqiqah ekonomis -->
+                    <!-- {% if orderDetail.type == 'PAKET AQIQAH EKONOMIS' %}
+                    {% if orderDetail.is_pae_domba_panggang == 1 %}
+                    <tr>
+                        <td>DOMBA PANGGANG</td>
+                        <td>{{ orderDetail.total_quantity_1 }}</td>
+                        <td>{{ skphBox.porsi_per_bungkus_non_sate_quantity }}</td>
+                        {% if (orderDetail.is_global == 1) or (orderDetail.global_all == 1) %}
+                        <td>
+                            {% set qtyGlobal = namespace(value=0) %}
+                            {% if orderDetail.global_all == 1 %}
+                            {% set qtyGlobal.value = 1|int %}
+                            {% else %}
+                            {% set qtyGlobal.value = orderDetail.total_quantity_1|int - orderDetail.is_global_qty|int %}
+                            {% endif %}
+                            {{ qtyGlobal.value|int }}
+                        </td>
+                        <td>{% if orderDetail.global_all == 1 %} {{ orderDetail.total_quantity_1|int }}{% else %}
+                            {{ orderDetail.is_global_qty|int }}{% endif %}</td>
+                        <td>Global</td>
+                        {% else %}
+                        <td>{{ orderDetail.total_quantity_1 }}</td>
+                        <td>{{ skphBox.sisa_non_sate_quantity }}</td>
+                        <td>{% if skphBox.porsi_non_sate_description != '' %}
+                            {{ skphBox.porsi_non_sate_description }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endif %}
+                    {% endif %} -->
+                    <!-- selesai paket aqiqah ekonomis -->
+                    {% else %}
+                    <!-- satuan non sate -->
+                    {% if (orderDetail.is_panggang == 1) and (orderDetail.quantity_panggang|int != 0) %}
+                    <tr>
+                        <td>PANGGANG</td>
+                        <td>{{ orderDetail.quantity_panggang }}</td>
+                        <td>{{ skphOrder.porsi_per_bungkus_non_sate_quantity }}</td>
+                        {% if (orderDetail.is_global == 1) or (orderDetail.global_all == 1) %}
+                        <td>
+                            {% set qtyGlobal = namespace(value=0) %}
+                            {% if orderDetail.global_all == 1 %}
+                            {% set qtyGlobal.value = 1|int %}
+                            {% else %}
+                            {% set qtyGlobal.value = orderDetail.quantity_panggang|int -
+                            orderDetail.is_global_qty|int %}
+                            {% endif %}
+                            {{ qtyGlobal.value|int }}
+                        </td>
+                        <td>{% if orderDetail.global_all == 1 %} {{ orderDetail.quantity_panggang|int }}{% else %}
+                            {{ orderDetail.is_global_qty|int }}{% endif %}</td>
+                        <td>Global</td>
+                        {% else %}
+                        <td>{{ orderDetail.quantity_panggang }}</td>
+                        <td>{{ skphOrder.sisa_non_sate_quantity }}</td>
+                        <td>{% if skphOrder.porsi_non_sate_description != '' %}
+                            {{ skphOrder.porsi_non_sate_description }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endif %}
+                    <!-- gulai -->
+                    {% if (orderDetail.is_gulai == 1) and (orderDetail.quantity_gulai|int != 0) %}
+                    <tr>
+                        <td>GULAI</td>
+                        <td>{{ orderDetail.quantity_gulai }}</td>
+                        <td>{{ skphOrder.porsi_per_bungkus_non_sate_quantity }}</td>
+                        {% if (orderDetail.is_global == 1) or (orderDetail.global_all == 1) %}
+                        <td>
+                            {% set qtyGlobal = namespace(value=0) %}
+                            {% if orderDetail.global_all == 1 %}
+                            {% set qtyGlobal.value = 1|int %}
+                            {% else %}
+                            {% set qtyGlobal.value = orderDetail.quantity_gulai|int - orderDetail.is_global_qty|int %}
+                            {% endif %}
+                            {{ qtyGlobal.value|int }}
+                        </td>
+                        <td>{% if orderDetail.global_all == 1 %} {{ orderDetail.quantity_gulai|int }}{% else %}
+                            {{ orderDetail.is_global_qty|int }}{% endif %}</td>
+                        <td>Global</td>
+                        {% else %}
+                        <td>{{ orderDetail.quantity_gulai }}</td>
+                        <td>{{ skphOrder.sisa_non_sate_quantity }}</td>
+                        <td>{% if skphOrder.porsi_non_sate_description != '' %}
+                            {{ skphOrder.porsi_non_sate_description }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endif %}
+                    <!-- teriyaki -->
+                    {% if (orderDetail.is_teriyaki == 1) and (orderDetail.quantity_teriyaki|int != 0) %}
+                    <tr>
+                        <td>TERIYAKI</td>
+                        <td>{{ orderDetail.quantity_teriyaki }}</td>
+                        <td>{{ skphOrder.porsi_per_bungkus_non_sate_quantity }}</td>
+                        {% if (orderDetail.is_global == 1) or (orderDetail.global_all == 1) %}
+                        <td>
+                            {% set qtyGlobal = namespace(value=0) %}
+                            {% if orderDetail.global_all == 1 %}
+                            {% set qtyGlobal.value = 1|int %}
+                            {% else %}
+                            {% set qtyGlobal.value = orderDetail.quantity_teriyaki|int - orderDetail.is_global_qty|int
+                            %}
+                            {% endif %}
+                            {{ qtyGlobal.value|int }}
+                        </td>
+                        <td>{% if orderDetail.global_all == 1 %} {{ orderDetail.quantity_teriyaki|int }}{% else %}
+                            {{ orderDetail.is_global_qty|int }}{% endif %}</td>
+                        <td>Global</td>
+                        {% else %}
+                        <td>{{ orderDetail.quantity_teriyaki }}</td>
+                        <td>{{ skphOrder.sisa_non_sate_quantity }}</td>
+                        <td>{% if skphOrder.porsi_non_sate_description != '' %}
+                            {{ skphOrder.porsi_non_sate_description }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endif %}
+                    <!-- kari -->
+                    {% if (orderDetail.is_kari == 1) and (orderDetail.quantity_kari|int != 0) %}
+                    <tr>
+                        <td>KARI</td>
+                        <td>{{ orderDetail.quantity_kari }}</td>
+                        <td>{{ skphOrder.porsi_per_bungkus_non_sate_quantity }}</td>
+                        {% if (orderDetail.is_global == 1) or (orderDetail.global_all == 1) %}
+                        <td>
+                            {% set qtyGlobal = namespace(value=0) %}
+                            {% if orderDetail.global_all == 1 %}
+                            {% set qtyGlobal.value = 1|int %}
+                            {% else %}
+                            {% set qtyGlobal.value = orderDetail.quantity_kari|int - orderDetail.is_global_qty|int %}
+                            {% endif %}
+                            {{ qtyGlobal.value|int }}
+                        </td>
+                        <td>{% if orderDetail.global_all == 1 %} {{ orderDetail.quantity_kari|int }}{% else %}
+                            {{ orderDetail.is_global_qty|int }}{% endif %}</td>
+                        <td>Global</td>
+                        {% else %}
+                        <td>{{ orderDetail.quantity_kari }}</td>
+                        <td>{{ skphOrder.sisa_non_sate_quantity }}</td>
+                        <td>{% if skphOrder.porsi_non_sate_description != '' %}
+                            {{ skphOrder.porsi_non_sate_description }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endif %}
+                    <!-- semur -->
+                    {% if (orderDetail.is_semur == 1) and (orderDetail.quantity_semur|int != 0) %}
+                    <tr>
+                        <td>SEMUR</td>
+                        <td>{{ orderDetail.quantity_semur }}</td>
+                        <td>{{ skphOrder.porsi_per_bungkus_non_sate_quantity }}</td>
+                        {% if (orderDetail.is_global == 1) or (orderDetail.global_all == 1) %}
+                        <td>
+                            {% set qtyGlobal = namespace(value=0) %}
+                            {% if orderDetail.global_all == 1 %}
+                            {% set qtyGlobal.value = 1|int %}
+                            {% else %}
+                            {% set qtyGlobal.value = orderDetail.quantity_semur|int - orderDetail.is_global_qty|int %}
+                            {% endif %}
+                            {{ qtyGlobal.value|int }}
+                        </td>
+                        <td>{% if orderDetail.global_all == 1 %} {{ orderDetail.quantity_semur|int }}{% else %}
+                            {{ orderDetail.is_global_qty|int }}{% endif %}</td>
+                        <td>Global</td>
+                        {% else %}
+                        <td>{{ orderDetail.quantity_semur }}</td>
+                        <td>{{ skphOrder.sisa_non_sate_quantity }}</td>
+                        <td>{% if skphOrder.porsi_non_sate_description != '' %}
+                            {{ skphOrder.porsi_non_sate_description }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endif %}
+                    <!-- sop -->
+                    {% if (orderDetail.is_sop == 1) and (orderDetail.quantity_sop|int != 0) %}
+                    <tr>
+                        <td>SOP</td>
+                        <td>{{ orderDetail.quantity_sop }}</td>
+                        <td>{{ skphOrder.porsi_per_bungkus_non_sate_quantity }}</td>
+                        {% if (orderDetail.is_global == 1) or (orderDetail.global_all == 1) %}
+                        <td>
+                            {% set qtyGlobal = namespace(value=0) %}
+                            {% if orderDetail.global_all == 1 %}
+                            {% set qtyGlobal.value = 1|int %}
+                            {% else %}
+                            {% set qtyGlobal.value = orderDetail.quantity_sop|int - orderDetail.is_global_qty|int %}
+                            {% endif %}
+                            {{ qtyGlobal.value|int }}
+                        </td>
+                        <td>{% if orderDetail.global_all == 1 %} {{ orderDetail.quantity_sop|int }}{% else %}
+                            {{ orderDetail.is_global_qty|int }}{% endif %}</td>
+                        <td>Global</td>
+                        {% else %}
+                        <td>{{ orderDetail.quantity_sop }}</td>
+                        <td>{{ skphOrder.sisa_non_sate_quantity }}</td>
+                        <td>{% if skphOrder.porsi_non_sate_description != '' %}
+                            {{ skphOrder.porsi_non_sate_description }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endif %}
+                    <!-- tengkleng -->
+                    {% if (orderDetail.is_tengkleng == 1) and (orderDetail.quantity_tengkleng|int != 0) %}
+                    <tr>
+                        <td>TENGKLENG</td>
+                        <td>{{ orderDetail.quantity_tengkleng }}</td>
+                        <td>{{ skphOrder.porsi_per_bungkus_non_sate_quantity }}</td>
+                        {% if (orderDetail.is_global == 1) or (orderDetail.global_all == 1) %}
+                        <td>
+                            {% set qtyGlobal = namespace(value=0) %}
+                            {% if orderDetail.global_all == 1 %}
+                            {% set qtyGlobal.value = 1|int %}
+                            {% else %}
+                            {% set qtyGlobal.value = orderDetail.quantity_tengkleng|int - orderDetail.is_global_qty|int
+                            %}
+                            {% endif %}
+                            {{ qtyGlobal.value|int }}
+                        </td>
+                        <td>{% if orderDetail.global_all == 1 %} {{ orderDetail.quantity_tengkleng|int }}{% else %}
+                            {{ orderDetail.is_global_qty|int }}{% endif %}</td>
+                        <td>Global</td>
+                        {% else %}
+                        <td>{{ orderDetail.quantity_tengkleng }}</td>
+                        <td>{{ skphOrder.sisa_non_sate_quantity }}</td>
+                        <td>{% if skphOrder.porsi_non_sate_description != '' %}
+                            {{ skphOrder.porsi_non_sate_description }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endif %}
+                    <!-- tongseng -->
+                    {% if (orderDetail.is_tongseng == 1) and (orderDetail.quantity_tongseng|int != 0) %}
+                    <tr>
+                        <td>TONGSENG</td>
+                        <td>{{ orderDetail.quantity_tongseng }}</td>
+                        <td>{{ skphOrder.porsi_per_bungkus_non_sate_quantity }}</td>
+                        {% if (orderDetail.is_global == 1) or (orderDetail.global_all == 1) %}
+                        <td>
+                            {% set qtyGlobal = namespace(value=0) %}
+                            {% if orderDetail.global_all == 1 %}
+                            {% set qtyGlobal.value = 1|int %}
+                            {% else %}
+                            {% set qtyGlobal.value = orderDetail.quantity_tongseng|int - orderDetail.is_global_qty|int
+                            %}
+                            {% endif %}
+                            {{ qtyGlobal.value|int }}
+                        </td>
+                        <td>{% if orderDetail.global_all == 1 %} {{ orderDetail.quantity_tongseng|int }}{% else %}
+                            {{ orderDetail.is_global_qty|int }}{% endif %}</td>
+                        <td>Global</td>
+                        {% else %}
+                        <td>{{ orderDetail.quantity_tongseng }}</td>
+                        <td>{{ skphOrder.sisa_non_sate_quantity }}</td>
+                        <td>{% if skphOrder.porsi_non_sate_description != '' %}
+                            {{ skphOrder.porsi_non_sate_description }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endif %}
+                    <!-- bakar_bbq -->
+                    {% if (orderDetail.is_bakar_bbq == 1) and (orderDetail.quantity_bakar_bbq|int != 0) %}
+                    <tr>
+                        <td>BAKAR BBQ</td>
+                        <td>{{ orderDetail.quantity_bakar_bbq }}</td>
+                        <td>{{ skphOrder.porsi_per_bungkus_non_sate_quantity }}</td>
+                        {% if (orderDetail.is_global == 1) or (orderDetail.global_all == 1) %}
+                        <td>
+                            {% set qtyGlobal = namespace(value=0) %}
+                            {% if orderDetail.global_all == 1 %}
+                            {% set qtyGlobal.value = 1|int %}
+                            {% else %}
+                            {% set qtyGlobal.value = orderDetail.quantity_bakar_bbq|int - orderDetail.is_global_qty|int
+                            %}
+                            {% endif %}
+                            {{ qtyGlobal.value|int }}
+                        </td>
+                        <td>{% if orderDetail.global_all == 1 %} {{ orderDetail.quantity_bakar_bbq|int }}{% else %}
+                            {{ orderDetail.is_global_qty|int }}{% endif %}</td>
+                        <td>Global</td>
+                        {% else %}
+                        <td>{{ orderDetail.quantity_bakar_bbq }}</td>
+                        <td>{{ skphOrder.sisa_non_sate_quantity }}</td>
+                        <td>{% if skphOrder.porsi_non_sate_description != '' %}
+                            {{ skphOrder.porsi_non_sate_description }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endif %}
+                    <!-- guling -->
+                    {% if (orderDetail.is_guling == 1) and (orderDetail.quantity_guling|int != 0) %}
+                    <tr>
+                        <td>GULING</td>
+                        <td>{{ orderDetail.quantity_guling }}</td>
+                        <td>{{ skphOrder.porsi_per_bungkus_non_sate_quantity }}</td>
+                        {% if (orderDetail.is_global == 1) or (orderDetail.global_all == 1) %}
+                        <td>
+                            {% set qtyGlobal = namespace(value=0) %}
+                            {% if orderDetail.global_all == 1 %}
+                            {% set qtyGlobal.value = 1|int %}
+                            {% else %}
+                            {% set qtyGlobal.value = orderDetail.quantity_guling|int - orderDetail.is_global_qty|int %}
+                            {% endif %}
+                            {{ qtyGlobal.value|int }}
+                        </td>
+                        <td>{% if orderDetail.global_all == 1 %} {{ orderDetail.quantity_guling|int }}{% else %}
+                            {{ orderDetail.is_global_qty|int }}{% endif %}</td>
+                        <td>Global</td>
+                        {% else %}
+                        <td>{{ orderDetail.quantity_guling }}</td>
+                        <td>{{ skphOrder.sisa_non_sate_quantity }}</td>
+                        <td>{% if skphOrder.porsi_non_sate_description != '' %}
+                            {{ skphOrder.porsi_non_sate_description }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endif %}
+                    <!-- masak_bombay -->
+                    {% if (orderDetail.is_masak_bombay == 1) and (orderDetail.quantity_masak_bombay|int != 0) %}
+                    <tr>
+                        <td>MASAK BOMBAY</td>
+                        <td>{{ orderDetail.quantity_masak_bombay }}</td>
+                        <td>{{ skphOrder.porsi_per_bungkus_non_sate_quantity }}</td>
+                        {% if (orderDetail.is_global == 1) or (orderDetail.global_all == 1) %}
+                        <td>
+                            {% set qtyGlobal = namespace(value=0) %}
+                            {% if orderDetail.global_all == 1 %}
+                            {% set qtyGlobal.value = 1|int %}
+                            {% else %}
+                            {% set qtyGlobal.value = orderDetail.quantity_masak_bombay|int -
+                            orderDetail.is_global_qty|int %}
+                            {% endif %}
+                            {{ qtyGlobal.value|int }}
+                        </td>
+                        <td>{% if orderDetail.global_all == 1 %} {{ orderDetail.quantity_masak_bombay|int }}{% else %}
+                            {{ orderDetail.is_global_qty|int }}{% endif %}</td>
+                        <td>Global</td>
+                        {% else %}
+                        <td>{{ orderDetail.quantity_masak_bombay }}</td>
+                        <td>{{ skphOrder.sisa_non_sate_quantity }}</td>
+                        <td>{% if skphOrder.porsi_non_sate_description != '' %}
+                            {{ skphOrder.porsi_non_sate_description }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endif %}
+
+
+                    {% endif %}
+                    {%- endfor -%}
+                </table>
+                <br />
+                <div class="text-left">
+                    <p>Note:</p>
+                    <p>1. Pelunasan & perubahan order paling lambat H-2</p>
+                    <p>2. Pembayaran bisa dilakukan secara cash atau transfer ke rek BCA</p>
+                    <p>3. Penyembelihan dilakukan H-1 di showroom As-Shidiq Aqiqah (Jl. Anggrek Petukangan Utara)</p>
+                </div>
+            </div>
+            <div class="kanan text-center">
+                <p class="bold">Jakarta, {{ frappe.utils.formatdate(doc.transaction_date, "dd-MM-YYYY") }} </p>
+                <table style="font-size: 10px; line-height: 10px;" class="text-center">
+                    <tr class="bold">
+                        <td>Sales</td>
+                        <td>Pemesan</td>
+                    </tr>
+                    <tr>
+                        <td class="line">&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        {% if doc.amended_from %}
+                        {% set amend = frappe.get_doc("Sales Order", doc.amended_from) %}
+                        {% set user = frappe.get_doc("User", amend.created_by) %}
+                        <td>{{ user.full_name }}</td>
+                        {% else %}
+                        {% set user = frappe.get_doc("User", doc.created_by) %}
+                        <td>{{ user.full_name }}</td>
+                        {% endif %}
+                        <td>{{ doc.customer_name }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endfor %}
+
+
+<style>
+    .pagebreak {
+        page-break-inside: avoid;
+    }
+
+    .line {
+        line-height: 35px;
+        padding-left: 10px;
+    }
+
+    .tg {
+        border-collapse: collapse;
+        border-color: black;
+        border-spacing: 0;
+        border-style: solid;
+        border-width: 1px;
+    }
+
+    .data {
+        font-size: 10px;
+        text-align: center;
+        justify-content: space-between;
+    }
+
+    .kanan {
+        text-align: center;
+        padding-right: 15px;
+        float: right;
+    }
+
+    .kiri {
+        float: left;
+        width: 60%;
+    }
+
+    .print-format {
+        padding: 10px !important;
+        overflow: auto;
+    }
+
+    .bold {
+        font-weight: bold;
+    }
+</style>

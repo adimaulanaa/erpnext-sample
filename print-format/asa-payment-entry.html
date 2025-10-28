@@ -1,0 +1,156 @@
+{%- from "templates/print_formats/standard_macros.html" import add_header, render_field with context -%}
+{% for page in layout %}
+
+<div>
+    <img src="/files/Asshidiq.png" />
+</div>
+<div class="print-heading">
+
+    <h2>
+        <div>Payment Entry</div>
+        <small class="sub-heading">{{ doc.name }}</small>
+    </h2>
+</div>
+{% if doc.status.upper() == 'DRAFT' %}
+<div class="text-center">
+    <h4>{{ doc.status.upper() }}</h4>
+</div>
+{% endif %}
+<div class="rowData">
+    <div class="column-data">
+        <table class="tabel">
+            <tr>
+                <td width="170px" class="bold">{{ _("Payment Type:") }}</td>
+                <td></td>
+                <td class="bold">{{ doc.payment_type }}</td>
+            </tr>
+            <tr>
+                <td class="line">&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td class="bold">{{ _("Party:") }}</td>
+                <td></td>
+                <td class="bold">{{ doc.party }}</td>
+            </tr>
+            <tr>
+                <td class="bold">{{ _("Party Name:") }}</td>
+                <td></td>
+                <td>{{ doc.party_name }}</td>
+            </tr>
+            <tr>
+                <td class="bold">{{ _("Paid Amount:") }}</td>
+                <td></td>
+                <td class="bold-1" width="250px">{{ frappe.utils.fmt_money(doc.paid_amount, currency="Rp. ") }}</td>
+            </tr>
+        </table>
+    </div>
+    <div class="column-data">
+        <table style="margin: 0; font-size: 14px;">
+            <tr>
+                <td width="130px" class="bold">{{ _("Posting Date:") }}</td>
+                <td></td>
+                <td class="bold">{{ frappe.utils.formatdate(doc.posting_date, "dd-MM-YYYY") }}</td>
+            </tr>
+            <tr>
+                <td class="bold">{{ _("Mode of Payment:") }}</td>
+                <td></td>
+                <td>{{ doc.mode_of_payment }}</td>
+            </tr>
+            <tr>
+            </tr>
+            <tr>
+                <td class="bold">{{ _("Contact:") }}</td>
+                <td></td>
+                <td>{{ doc.contact_person }}</td>
+            </tr>
+
+        </table>
+    </div>
+</div>
+<br />
+<div class="bill">
+    <table style="margin: 0; font-size: 14px;" class="table-bordered">
+        <thead>
+            <tr>
+                <th class="tg-0pky">Sr</th>
+                <th class="tg-0pky">Type</th>
+                <th class="tg-0lax">Name</th>
+                <th class="tg-0lax  text-right">Grand Total</th>
+                <th class="tg-0lax  text-right">Allocated</th>
+                <th class="tg-0lax  text-right">Outstanding</th>
+            </tr>
+        </thead>
+        <tbody>
+            {%- for item in doc.references -%}
+            {% set total = item.total_amount %}
+            {% set allocated = item.allocated_amount %}
+            {% set draftAllocated = item.outstanding_amount - allocated or 0 %}
+            <tr>
+                <td class="tg-0pky">{{ loop.index }}</td>
+                <td class="tg-0pky" width="20%">{{ item.reference_doctype }}</td>
+                <td class="tg-0lax" width="30%">{{ item.reference_name }}</td>
+                <td class="tg-0lax text-right" width="20%">{{ frappe.utils.fmt_money(item.total_amount, currency="") }}
+                </td>
+                <td class="tg-0lax text-right" width="20%">{{ frappe.utils.fmt_money(item.allocated_amount, currency="")
+                    }}</td>
+                {% if doc.status == 'Draft' %}
+                <td class="tg-0lax text-right" width="20%">{{ frappe.utils.fmt_money(draftAllocated, currency="") }}
+                </td>
+                {% else %}
+                <td class="tg-0lax text-right" width="20%">{{ frappe.utils.fmt_money(item.outstanding_amount,
+                    currency="") }}</td>
+                {% endif %}
+
+            </tr>
+            {%- endfor -%}
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .print-format {
+        padding: 0.25in;
+    }
+
+    .bill {
+        padding-left: 10px;
+        padding-right: 10px;
+        width: 100%;
+    }
+
+    .line {
+        line-height: 35px;
+    }
+
+    .column-data {
+        float: left;
+        width: 50%;
+        padding: 10px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .rowData:after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+
+    .tabel {
+        margin: 0;
+        font-size: 14px;
+    }
+
+    .bold {
+        font-weight: bold;
+    }
+
+    .bold-1 {
+        font-weight: bold;
+        text-align: right;
+    }
+</style>
+
+{% endfor %}
